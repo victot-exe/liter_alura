@@ -15,15 +15,11 @@ public class ConvertDataImpl implements IConvertData{
 
     @Override
     public <T> T getData(String json, Class<T> clazz) {
+        List<T> result = getDataToList(json, clazz);
 
-        try{
-            return mapper.readValue(json, clazz);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return result.isEmpty() ? null : result.getFirst();
     }
 
-    @Override
     public <T> List<T> getDataToList(String json, Class<T> clazz){
         try{
             JsonNode root = mapper.readTree(json);

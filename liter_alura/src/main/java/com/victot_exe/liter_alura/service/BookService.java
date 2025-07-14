@@ -2,6 +2,8 @@ package com.victot_exe.liter_alura.service;
 
 import com.victot_exe.liter_alura.dto.BookDTOEntry;
 import com.victot_exe.liter_alura.dto.BookDTOExit;
+import com.victot_exe.liter_alura.exception.LivroNaoEncontradoException;
+import com.victot_exe.liter_alura.model.Author;
 import com.victot_exe.liter_alura.model.Book;
 import com.victot_exe.liter_alura.repository.AuthorRepository;
 import com.victot_exe.liter_alura.repository.BookRepository;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +31,7 @@ public class BookService {
         this.authorRepository = authorRepository;
     }
 
+    //Opcao 1
     public List<BookDTOExit> getBooks(){
         return bookRepository.findAllWithAuthorAndLanguages()
                 .stream().map(
@@ -40,47 +44,38 @@ public class BookService {
                 ).collect(Collectors.toList());
     }
 
-    public BookDTOExit getBooksByTitle(String title){//TODO colocar a correspondência exata do titulo ignorando maiuscula e minuscula é claro, caso não seja colocar livro não encontrado
+    //Opção 2
+    public BookDTOExit getBookByTitle(String title){
+
+        title = title.toLowerCase(Locale.ROOT);
+
+        if(bookRepository.existsByTitle(title)){
+            return BookDTOExit.from(bookRepository.getByTitle(title));
+        }
 
         String json = consumer.getDataFromURI(
                 URI + "?search=" + URLEncoder.encode(title, StandardCharsets.UTF_8).replace("+", "%20"));
 
-        Book result = conversor.getDataToList(json, BookDTOEntry.class)
-                .stream()
-                .map(Book::new)
-                .findFirst().orElseThrow();
-
-        if(bookRepository.existsByTitle(result.getTitle()) || bookRepository.existsByIdOnGuttendex(result.getIdOnGuttendex())){
-            Book bookDB = bookRepository.findBookWithLanguagesByTitle(result.getTitle()).get();
-            return new BookDTOExit(
-                    bookDB.getIdOnGuttendex(),
-                    bookDB.getTitle(),
-                    bookDB.getAuthor().getName(),
-                    bookDB.getLanguages().toString(),
-                    bookDB.getDownloadCount());
+        BookDTOEntry result = conversor.getData(json, BookDTOEntry.class);
+        //verifica se o livro foi encontrado
+        if(result == null){
+            throw new LivroNaoEncontradoException("O livro: " + title + " não foi encontrado");
         }
 
-        return this.save(result);
+        //verifica a correspondência exata do titulo e salva
+        if(!result.title().equalsIgnoreCase(title)){
+            throw new LivroNaoEncontradoException("O livro: " + title + " não foi encontrado");
+        }
+
+        return this.save(new Book(result));
     }
 
     private BookDTOExit save(Book book){
-        if(authorRepository.existsByName(book.getAuthor().getName())){
-            bookRepository.save(book);
-            return new BookDTOExit(
-                    book.getIdOnGuttendex(),
-                    book.getTitle(),
-                    book.getAuthor().getName(),
-                    book.getLanguages().toString(),
-                    book.getDownloadCount());
+        //verifica se o livro existe no repositorio local
+        if(bookRepository.existsByIdOnGuttendex(book.getIdOnGuttendex())){
+            return BookDTOExit.from(book);
         }
-        authorRepository.save(book.getAuthor());
-        bookRepository.save(book);
 
-        return new BookDTOExit(
-                book.getIdOnGuttendex(),
-                book.getTitle(),
-                book.getAuthor().getName(),
-                book.getLanguages().toString(),
-                book.getDownloadCount());
+        return BookDTOExit.from(bookRepository.save(book));
     }
 }

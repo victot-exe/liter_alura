@@ -16,26 +16,19 @@ public class AuthorService {
         this.authorRepository = authorRepository;
     }
 
+    //Opcao 3
     public List<AuthorDTO> getAutores(){
-        return authorRepository.findAll().stream().map(
-                a -> new AuthorDTO(
-                        a.getName(),
-                        a.getBirthYear(),
-                        a.getDeathYear()
-                ))
-        .collect(Collectors.toList());
+        return authorRepository.findAll()
+                .stream().map(AuthorDTO::from)
+                .collect(Collectors.toList());
     }
 
+    //Opcao 4
     public List<AuthorDTO> getAuthorLivingInYear(int year){
 
         return authorRepository.findAuthorsAliveInYear(year)
                 .stream()
-                .map(
-                        a -> new AuthorDTO(
-                                a.getName(),
-                                a.getBirthYear(),
-                                a.getDeathYear()
-                        ))
+                .map(AuthorDTO::from)
                 .collect(Collectors.toList());
     }
 }

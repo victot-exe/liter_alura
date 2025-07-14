@@ -10,8 +10,11 @@ import java.util.List;
 
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Integer> {
+
     boolean existsByName(String name);
+
     @Query("SELECT a FROM Author a WHERE a.birthYear <= :year AND (a.deathYear IS NULL OR a.deathYear >= :year)")
     List<Author> findAuthorsAliveInYear(@Param("year") int year);
 
+    Author findByName(String name);
 }

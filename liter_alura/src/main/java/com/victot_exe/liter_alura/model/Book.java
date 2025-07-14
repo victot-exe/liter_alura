@@ -24,7 +24,6 @@ public class Book {
     }
 
     public Book(BookDTOEntry entry){
-        this();
         this.idOnGuttendex = entry.id();
         this.title = entry.title();
         this.author = entry.authors().stream()

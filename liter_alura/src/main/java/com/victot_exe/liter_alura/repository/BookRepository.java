@@ -1,5 +1,6 @@
 package com.victot_exe.liter_alura.repository;
 
+import com.victot_exe.liter_alura.dto.BookDTOExit;
 import com.victot_exe.liter_alura.model.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +22,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     List<Book> findAllWithAuthorAndLanguages();
 
     boolean existsByIdOnGuttendex(Integer idOnGuttendex);
+
+    Book getByTitle(String title);
 }

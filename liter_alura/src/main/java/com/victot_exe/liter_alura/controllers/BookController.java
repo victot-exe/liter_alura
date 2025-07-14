@@ -12,7 +12,7 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    public BookDTOExit getBooksByTitle(String title){
-        return bookService.getBooksByTitle(title);//TODO quando for usar no menu lembrar de usar o try cath para tratar a excessão corretamente e dizer que não achou o livro
+    public BookDTOExit getBookByTitle(String title){
+        return bookService.getBookByTitle(title);//TODO quando for usar no menu lembrar de usar o try cath para tratar a excessão corretamente e dizer que não achou o livro
     }
 }
