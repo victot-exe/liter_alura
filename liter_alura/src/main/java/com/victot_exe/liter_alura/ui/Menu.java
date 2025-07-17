@@ -5,11 +5,13 @@ import com.victot_exe.liter_alura.dto.BookDTOExit;
 import com.victot_exe.liter_alura.exception.LivroNaoEncontradoException;
 import com.victot_exe.liter_alura.service.AuthorService;
 import com.victot_exe.liter_alura.service.BookService;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
+@Component
 public class Menu {
 
     private Scanner sc;
@@ -33,6 +35,7 @@ public class Menu {
                 2- Obter livro por título
                 3- Listar autores
                 4- Listar autores vivos no ano de:
+                5- Novo livro
                 """;
         int entrada = 0;
 
@@ -78,6 +81,9 @@ public class Menu {
             case 4:
                 listarAutoresVivosNoAno();
                 break;
+            case -1:
+                System.out.println("Valeu falou!");
+                break;
             default:
                 System.out.println("Insira uma opção válida ou pressione -1 para sair");
         }
@@ -97,7 +103,7 @@ public class Menu {
         String titulo = pegaEntradaStr();
 
         try {
-            bookService.getBookByTitle(titulo);
+            System.out.println(bookService.getBookByTitle(titulo));
         }catch (LivroNaoEncontradoException ex){
             System.out.println(ex.getMessage());
         }

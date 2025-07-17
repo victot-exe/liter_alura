@@ -76,6 +76,9 @@ public class BookService {
             return BookDTOExit.from(book);
         }
 
-        return BookDTOExit.from(bookRepository.save(book));
+
+        BookDTOExit result = BookDTOExit.from(bookRepository.save(book));
+
+        return result;
     }
 }

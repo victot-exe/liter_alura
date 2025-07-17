@@ -13,7 +13,7 @@ public class Book {
     private Integer id;
     private Integer idOnGuttendex;
     private String title;
-    @ManyToOne()    @JoinColumn(name = "author_id")
+    @ManyToOne(cascade = CascadeType.PERSIST)    @JoinColumn(name = "author_id")
     private Author author;
     @ElementCollection
     private Set<String> languages;
